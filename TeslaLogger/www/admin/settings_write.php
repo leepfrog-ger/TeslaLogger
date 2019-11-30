@@ -8,9 +8,24 @@ echo($SleepTimeSpanEnd);
 $SleepTimeSpanEnable = $_POST["SleepTimeSpanEnable"];
 echo($SleepTimeSpanEnable);
 
+$SleepTimeSpanEnable = $_POST["SleepTimeSpanEnable"];
+echo($SleepTimeSpanEnable);
+
+$Language = $_POST["Language"];
+$Power = $_POST["Power"];
+$Temperature = $_POST["Temperature"];
+$Length = $_POST["Length"];
+$URL_Admin = $_POST["URL_Admin"];
+
 $j = array('SleepTimeSpanStart' => $SleepTimeSpanStart,
 'SleepTimeSpanEnd' => $SleepTimeSpanEnd,
-'SleepTimeSpanEnable' => $SleepTimeSpanEnable);
+'SleepTimeSpanEnable' => $SleepTimeSpanEnable,
+'Power' => $Power,
+'Temperature' => $Temperature,
+'Length' => $Length,
+'Language' => $Language,
+'URL_Admin' =>$URL_Admin
+);
 
 file_put_contents('/etc/teslalogger/settings.json', json_encode($j));
 

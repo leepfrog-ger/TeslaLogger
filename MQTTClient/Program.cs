@@ -12,22 +12,22 @@ namespace MQTTClient
     {
         static void Main(string[] args)
         {
+            string clientid = Guid.NewGuid().ToString();
+
             MqttClient client = null;
             try
             {
-
-
-                Tools.Log("MqttClient Version: " + System.Reflection.Assembly.GetExecutingAssembly().GetName().Version);
+                Logfile.Log("MqttClient Version: " + System.Reflection.Assembly.GetExecutingAssembly().GetName().Version);
 
                 if (Properties.Settings.Default.MQTTHost.Length == 0)
                 {
-                    Tools.Log("No MQTTHost settings -> MQTT disabled!");
+                    Logfile.Log("No MQTTHost settings -> MQTT disabled!");
                     return;
                 }
 
                 if (Properties.Settings.Default.Topic.Length == 0)
                 {
-                    Tools.Log("No Topic settings -> MQTT disabled!");
+                    Logfile.Log("No Topic settings -> MQTT disabled!");
                     return;
                 }
 
@@ -35,19 +35,19 @@ namespace MQTTClient
 
                 if (Properties.Settings.Default.Name.Length > 0 && Properties.Settings.Default.Password.Length > 0)
                 {
-                    Tools.Log("Connecting with credentials: " + Properties.Settings.Default.MQTTHost);
-                    client.Connect(Guid.NewGuid().ToString(), Properties.Settings.Default.Name, Properties.Settings.Default.Password);
+                    Logfile.Log("Connecting with credentials: " + Properties.Settings.Default.MQTTHost);
+                    client.Connect(clientid, Properties.Settings.Default.Name, Properties.Settings.Default.Password);
                 }
                 else
                 {
-                    Tools.Log("Connecting without credentials: " + Properties.Settings.Default.MQTTHost);
-                    client.Connect(Guid.NewGuid().ToString());
+                    Logfile.Log("Connecting without credentials: " + Properties.Settings.Default.MQTTHost);
+                    client.Connect(clientid);
                 }
-                Tools.Log("Connected!");
+                Logfile.Log("Connected!");
             }
             catch (Exception ex)
             {
-                Tools.Log(ex.Message);
+                Logfile.Log(ex.Message);
             }
 
             string lastjson = "-";
@@ -56,7 +56,14 @@ namespace MQTTClient
             {
                 try
                 {
-                    System.Threading.Thread.Sleep(1000);
+                    System.Threading.Thread.Sleep(5000);
+
+                    if (!client.IsConnected)
+                    {
+                        Logfile.Log("Reconnect");
+                        client.Connect(clientid);
+                    }
+
                     string temp = System.IO.File.ReadAllText("/etc/teslalogger/current_json.txt");
                     if (temp != lastjson)
                     {
@@ -66,7 +73,8 @@ namespace MQTTClient
                 }
                 catch (Exception ex)
                 {
-                    Tools.Log(ex.ToString());
+                    System.Threading.Thread.Sleep(30000);
+                    Logfile.Log(ex.ToString());
                 }
             }
         }
